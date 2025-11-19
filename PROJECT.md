@@ -97,12 +97,12 @@ Entwicklung eines MCP (Model Context Protocol) Servers für Microsoft Sentinel, 
 ### Decision Log
 
 #### AD-001: MCP Server Approach
-**Status:** ⏳ Pending  
+**Status:** ✅ Decided (2025-11-19)  
 **Question:** Eigener Server vs. Microsoft MCP Extension vs. Hybrid?  
 **Options:**
 - **A:** Nur Microsoft's MCP Server nutzen + Custom Security Copilot Agents
 - **B:** Eigener MCP Server mit PowerShell-Backend
-- **C:** Hybrid - beide kombinieren für unterschiedliche Use Cases
+- **C:** Hybrid - beide kombinieren für unterschiedliche Use Cases ✅ **SELECTED**
 
 **Criteria:**
 - Maintenance Overhead
@@ -110,27 +110,38 @@ Entwicklung eines MCP (Model Context Protocol) Servers für Microsoft Sentinel, 
 - Integration mit bestehendem Code
 - Customer Access Control
 
-**Decision:** TBD  
-**Rationale:** TBD
+**Decision:** **Option C - Hybrid Approach**  
+**Rationale:** 
+- Nutzt Microsoft's gehostete MCP Tools für Data Exploration (zero infrastructure)
+- Custom MCP Server für spezialisierte Management/Automation Tools
+- Best of both worlds - Flexibility wo nötig, managed services wo möglich
+- Ermöglicht schrittweisen Ausbau
+- Reduziert Maintenance Overhead durch Nutzung von Microsoft's Infrastructure für Standard-Use-Cases
 
 ---
 
 #### AD-002: Target Audience Priority
-**Status:** ⏳ Pending  
+**Status:** ✅ Decided (2025-11-19)  
 **Question:** Für wen bauen wir primär?  
 **Options:**
-- **A:** Internal Team (SOC Analysts, Engineers)
+- **A:** Internal Team (SOC Analysts, Engineers) ✅ **SELECTED**
 - **B:** Self-Service (eigene Effizienz)
 - **C:** Customer Portal (Managed Service Kunden)
 - **D:** All of the above (phased approach)
 
-**Decision:** TBD  
-**Rationale:** TBD
+**Decision:** **Option A - Internal Team (SOC Focus)**  
+**Rationale:** 
+- Fokus auf Standardisierung der SOC Operations
+- Team-Effizienz steigern durch einheitliche Tools
+- Wissenstransfer erleichtern
+- Schnelleres Feedback für Iteration
+- Foundation für spätere Customer Self-Service Portale
+- Team kann als Beta-Tester fungieren bevor Customer Rollout
 
 ---
 
 #### AD-003: Technology Stack
-**Status:** ⏳ Pending  
+**Status:** ✅ Decided (2025-11-19)  
 **Question:** Python (FastMCP) vs. TypeScript (MCP SDK)?  
 **Considerations:**
 - Bestehende PowerShell-Integration
@@ -138,8 +149,48 @@ Entwicklung eines MCP (Model Context Protocol) Servers für Microsoft Sentinel, 
 - Microsoft Sentinel REST API Libraries
 - Maintenance
 
-**Decision:** TBD  
-**Rationale:** TBD
+**Decision:** **Python with FastMCP Framework**  
+**Rationale:** 
+- Excellent Azure SDK support (azure-identity, azure-mgmt-*)
+- FastMCP provides simple, Pythonic MCP server implementation
+- Easy PowerShell Core integration via subprocess
+- Strong data processing capabilities (pandas, etc.) for result aggregation
+- Better libraries for KQL and Azure Monitor Query API
+- Team familiar with Python
+- Large ecosystem for security tools and libraries
+- Good async support for concurrent multi-tenant operations
+
+---
+
+#### AD-004: Phase 1 Tool Prioritization
+**Status:** ✅ Decided (2025-11-19)  
+**Question:** Which 3-5 tools for MVP?  
+
+**Decision:** **3 Foundation Tools**
+1. **`sentinel_health_check`** - Multi-tenant health monitoring
+   - Priority: HIGH | Complexity: Low-Medium
+   - Impact: Immediate visibility across all tenants
+   - Foundation for other monitoring tools
+
+2. **`data_connector_status`** - Data ingestion monitoring
+   - Priority: HIGH | Complexity: Medium  
+   - Impact: Critical for ensuring data flow
+   - Identifies stale/broken connectors quickly
+
+3. **`custom_kql_execute`** - Multi-tenant KQL execution
+   - Priority: HIGH | Complexity: Medium-High
+   - Impact: Enables ad-hoc queries across tenants
+   - Foundation for advanced analytics
+
+**Rationale:**
+- These 3 tools provide immediate value to SOC team
+- Cover critical operational needs (health, data, queries)
+- Build foundation for Phase 2 automation tools
+- Demonstrate hybrid architecture effectively
+- Realistic 2-3 week timeline for MVP
+- Low risk, high impact combination
+
+**Phase 2 & 3 Tools:** See PHASE-1-IMPLEMENTATION-PLAN.md for full roadmap
 
 ---
 
