@@ -57,7 +57,11 @@ async def main():
     lighthouse = await get_lighthouse_manager(authenticator)
 
     try:
-        workspaces = await lighthouse.get_sentinel_workspaces()
+        # Use specific subscription ID from config instead of listing all
+        subscription_id = azure_config.subscription_id
+        logger.info(f"Querying subscription: {subscription_id}")
+
+        workspaces = await lighthouse.get_sentinel_workspaces(subscription_id=subscription_id)
         logger.info(f"✅ Found {len(workspaces)} Sentinel workspaces")
 
         for ws in workspaces:
