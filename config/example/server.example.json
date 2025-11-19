@@ -1,0 +1,26 @@
+{
+  "server": {
+    "name": "sentinel-mcp-server",
+    "version": "0.1.0",
+    "port": 3000,
+    "host": "localhost"
+  },
+  "azure": {
+    "tenantId": "{{ AZURE_TENANT_ID }}",
+    "clientId": "{{ AZURE_CLIENT_ID }}",
+    "lighthouse": {
+      "enabled": true
+    }
+  },
+  "tools": {
+    "enabled": [
+      "sentinel_health_check",
+      "sentinel_compliance_check",
+      "sentinel_backup_create"
+    ]
+  },
+  "logging": {
+    "level": "INFO",
+    "format": "json"
+  }
+}

@@ -1,0 +1,39 @@
+# Development Dependencies
+# Install with: pip install -r requirements-dev.txt
+
+# Include all production dependencies
+-r requirements.txt
+
+# Additional Development Tools
+pre-commit>=3.6.0
+commitizen>=3.13.0
+
+# Testing Tools
+pytest-xdist>=3.5.0  # Parallel testing
+faker>=21.0.0  # Test data generation
+responses>=0.24.0  # Mock HTTP responses
+freezegun>=1.4.0  # Time mocking
+
+# Code Quality & Linting
+pylint>=3.0.0
+flake8>=7.0.0
+isort>=5.13.0
+
+# Type Checking
+types-requests>=2.31.0
+types-pyyaml>=6.0.0
+
+# Documentation
+sphinx>=7.2.0
+sphinx-rtd-theme>=2.0.0
+sphinx-autodoc-typehints>=1.25.0
+
+# Debugging
+pdbpp>=0.10.3
+
+# Performance Profiling
+py-spy>=0.3.14
+memory-profiler>=0.61.0
+
+# API Mocking & Testing
+vcrpy>=5.1.0
