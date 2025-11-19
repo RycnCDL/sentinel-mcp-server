@@ -3,7 +3,7 @@
 # Python Version: >=3.10
 
 # Core MCP Framework
-mcp>=1.0.0  # Model Context Protocol SDK (version TBD based on FastMCP or official SDK)
+fastmcp>=0.1.0  # FastMCP - Simple Pythonic MCP server implementation
 
 # Azure SDK
 azure-identity>=1.15.0
