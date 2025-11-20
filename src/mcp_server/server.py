@@ -14,6 +14,7 @@ from utils.logging import setup_logging
 from utils.auth import get_authenticator
 from utils.lighthouse import get_lighthouse_manager
 from mcp_server.tools.management.health_check import check_sentinel_health
+from mcp_server.tools.powershell.sentinel_manager import register_powershell_tools
 
 logger = structlog.get_logger(__name__)
 
@@ -32,6 +33,9 @@ mcp = FastMCP(
     name=settings.mcp_server_name,
     version=settings.mcp_server_version,
 )
+
+# Register PowerShell tools
+register_powershell_tools(mcp)
 
 # Global authenticator and lighthouse manager (initialized on first request)
 _authenticator = None
