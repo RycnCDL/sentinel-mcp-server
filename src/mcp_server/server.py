@@ -142,29 +142,18 @@ async def sentinel_health_check(
         }
 
 
-@mcp.get_prompt("sentinel-health-report")
-async def sentinel_health_report_prompt() -> str:
-    """Generate a detailed health report for all Sentinel workspaces"""
-    return """Please check the health of all Microsoft Sentinel workspaces and provide a detailed report.
-
-Include:
-1. Overall health status summary
-2. Any workspaces with issues or warnings
-3. Data connector and analytics rule statistics
-4. Recommendations for any detected issues
-
-Use the sentinel_health_check tool with check_depth='detailed' for comprehensive results."""
-
-
-@mcp.get_prompt("sentinel-quick-status")
-async def sentinel_quick_status_prompt() -> str:
-    """Get a quick status overview of Sentinel workspaces"""
-    return """Please provide a quick status overview of all Microsoft Sentinel workspaces.
-
-Use the sentinel_health_check tool with check_depth='quick' and summarize:
-- Total number of workspaces
-- Overall health status
-- Any critical issues that need immediate attention"""
+# Prompts commented out - FastMCP prompt API usage needs review
+# TODO: Implement prompts correctly in future version
+#
+# @mcp.get_prompt("sentinel-health-report")
+# async def sentinel_health_report_prompt() -> str:
+#     """Generate a detailed health report for all Sentinel workspaces"""
+#     return """Please check the health of all Microsoft Sentinel workspaces..."""
+#
+# @mcp.get_prompt("sentinel-quick-status")
+# async def sentinel_quick_status_prompt() -> str:
+#     """Get a quick status overview of Sentinel workspaces"""
+#     return """Please provide a quick status overview..."""
 
 
 def main():
