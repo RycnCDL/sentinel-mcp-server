@@ -22,6 +22,8 @@ aiohttp>=3.9.0
 # PowerShell Integration
 # Note: PowerShell Core must be installed separately
 # See: https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell
+pypsrp>=0.8.0  # PowerShell Remoting Protocol for remote execution
+winrm>=0.4.3  # Windows Remote Management (alternative to pypsrp)
 
 # Configuration Management
 python-dotenv>=1.0.0
