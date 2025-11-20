@@ -1,6 +1,6 @@
 """
 MCP Tool Wrappers für SentinelManager PowerShell-Funktionen
-Alle Funktionen werden dynamisch als MCP-Tools registriert und nutzen die PowerShell Bridge.
+Generic tool approach - FastMCP compatible (no **kwargs)
 """
 import os
 import structlog
@@ -9,7 +9,7 @@ from utils.powershell_bridge import PowerShellBridge
 
 logger = structlog.get_logger(__name__)
 
-# Liste der PowerShell-Funktionen (aus SentinelManager)
+# Liste der verfügbaren PowerShell-Funktionen (aus SentinelManager)
 SENTINEL_FUNCTIONS = [
     # Tabellenverwaltung
     "New-SentinelTable",
@@ -74,41 +74,229 @@ def get_bridge() -> PowerShellBridge:
 
 def register_powershell_tools(mcp):
     """
-    Register all SentinelManager PowerShell functions as MCP tools
-    
+    Register generic PowerShell executor tools (FastMCP compatible)
+
     Args:
         mcp: FastMCP server instance
     """
-    logger.info("Registering PowerShell tools", function_count=len(SENTINEL_FUNCTIONS))
-    
-    # Register each function as an MCP tool
-    for func_name in SENTINEL_FUNCTIONS:
-        # Create a closure to capture func_name
-        def make_tool_func(name):
-            async def tool_func(**kwargs) -> dict:
-                """Execute PowerShell function via bridge"""
-                logger.info(f"Executing PowerShell function", function=name, params=kwargs)
-                bridge = get_bridge()
-                try:
-                    result = await bridge.execute_script(
-                        script_path=SCRIPT_PATH,
-                        function=name,
-                        params=kwargs,
-                        remote=False
-                    )
-                    logger.info(f"PowerShell function completed", function=name)
-                    return result
-                except Exception as e:
-                    logger.error(f"PowerShell function failed", function=name, error=str(e))
-                    raise
-            
-            # Set function metadata
-            tool_func.__name__ = name.replace("-", "_").lower()
-            tool_func.__doc__ = f"Execute PowerShell function: {name}"
-            return tool_func
-        
-        # Register tool with FastMCP
-        tool_func = make_tool_func(func_name)
-        mcp.tool()(tool_func)
-    
-    logger.info("PowerShell tools registered successfully")
+    logger.info(
+        "Registering PowerShell tools (generic approach)",
+        function_count=len(SENTINEL_FUNCTIONS),
+        available_functions=", ".join(SENTINEL_FUNCTIONS)
+    )
+
+    # Register local execution tool
+    @mcp.tool()
+    async def execute_sentinel_powershell(
+        function_name: str,
+        parameters: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """
+        Execute a SentinelManager PowerShell function locally.
+
+        This tool provides access to 39+ PowerShell functions for Microsoft Sentinel management.
+
+        Available Functions:
+
+        TABLE MANAGEMENT:
+        - New-SentinelTable: Create new custom table
+        - Get-SentinelTables: List all custom tables
+        - Remove-SentinelTable: Delete custom table
+        - Update-TablePlan: Change table pricing plan
+        - Update-TableRetention: Modify retention settings
+        - View-TableRetention: View current retention
+
+        ANALYTICS RULES:
+        - Get-AnalyticsRules: List all analytics rules
+        - Get-AnalyticsRuleDetails: Get rule details
+        - Enable-AnalyticsRule: Enable a rule
+        - Disable-AnalyticsRule: Disable a rule
+        - Remove-AnalyticsRule: Delete a rule
+        - New-AnalyticsRule: Create new rule
+
+        WORKBOOKS:
+        - Get-SentinelWorkbooks: List workbooks
+        - Get-WorkbookDetails: Get workbook details
+        - Remove-SentinelWorkbook: Delete workbook
+        - Export-SentinelWorkbook: Export workbook
+        - Import-SentinelWorkbook: Import workbook
+
+        INCIDENTS:
+        - Get-SentinelIncidents: List incidents
+        - Show-IncidentDetails: Get incident details
+        - Close-SentinelIncident: Close an incident
+        - Assign-IncidentOwner: Assign incident owner
+        - Add-IncidentComment: Add comment to incident
+        - Get-IncidentComments: List incident comments
+
+        BACKUP & EXPORT:
+        - Export-AnalyticsRules: Export all rules
+        - Export-AutomationRules: Export automation rules
+        - Export-Watchlists: Export watchlists
+        - Export-Functions: Export functions
+        - Export-SavedQueries: Export saved queries
+        - Export-TableData: Export table data
+
+        DCR/DCE MANAGEMENT:
+        - Get-DataCollectionRules: List DCRs
+        - Get-DataCollectionEndpoints: List DCEs
+        - New-DCRForTable: Create DCR for table
+        - New-StandaloneDCR: Create standalone DCR
+        - New-StandaloneDCE: Create standalone DCE
+        - Remove-DataCollectionRule: Delete DCR
+        - Remove-DataCollectionEndpoint: Delete DCE
+        - Update-DCRTransformation: Update DCR transformation
+        - Add-DCRDataSource: Add data source to DCR
+        - Test-DCRIngestion: Test DCR ingestion
+
+        Args:
+            function_name: Name of the PowerShell function to execute (e.g., "Get-AnalyticsRules")
+            parameters: Dictionary of parameters to pass to the function (optional)
+
+        Returns:
+            Dictionary containing the function execution result
+
+        Example:
+            {
+                "function_name": "Get-AnalyticsRules",
+                "parameters": {
+                    "WorkspaceName": "MyWorkspace",
+                    "Enabled": true
+                }
+            }
+        """
+        if parameters is None:
+            parameters = {}
+
+        # Validate function name
+        if function_name not in SENTINEL_FUNCTIONS:
+            available = ", ".join(SENTINEL_FUNCTIONS)
+            raise ValueError(
+                f"Unknown function '{function_name}'. "
+                f"Available functions: {available}"
+            )
+
+        logger.info(
+            "Executing PowerShell function (local)",
+            function=function_name,
+            params=parameters
+        )
+
+        bridge = get_bridge()
+        try:
+            result = await bridge.execute_script(
+                script_path=SCRIPT_PATH,
+                function=function_name,
+                params=parameters,
+                remote=False
+            )
+            logger.info("PowerShell function completed", function=function_name)
+            return {
+                "success": True,
+                "function": function_name,
+                "result": result
+            }
+        except Exception as e:
+            logger.error(
+                "PowerShell function failed",
+                function=function_name,
+                error=str(e)
+            )
+            return {
+                "success": False,
+                "function": function_name,
+                "error": str(e),
+                "error_type": type(e).__name__
+            }
+
+    # Register remote execution tool
+    @mcp.tool()
+    async def execute_sentinel_powershell_remote(
+        function_name: str,
+        remote_host: str,
+        parameters: Optional[Dict[str, Any]] = None,
+        username: Optional[str] = None,
+        password: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Execute a SentinelManager PowerShell function on a remote host via WinRM/PSRemoting.
+
+        Same functions available as execute_sentinel_powershell, but executed remotely.
+        Requires WinRM to be enabled on the target host.
+
+        Args:
+            function_name: Name of the PowerShell function to execute
+            remote_host: Remote host address (e.g., "server.domain.com")
+            parameters: Dictionary of parameters to pass to the function (optional)
+            username: Username for remote authentication (optional, uses current user if not provided)
+            password: Password for remote authentication (optional)
+
+        Returns:
+            Dictionary containing the function execution result
+
+        Example:
+            {
+                "function_name": "Get-AnalyticsRules",
+                "remote_host": "sentinel-mgmt.contoso.com",
+                "parameters": {
+                    "WorkspaceName": "MyWorkspace"
+                },
+                "username": "admin@contoso.com"
+            }
+        """
+        if parameters is None:
+            parameters = {}
+
+        # Validate function name
+        if function_name not in SENTINEL_FUNCTIONS:
+            available = ", ".join(SENTINEL_FUNCTIONS)
+            raise ValueError(
+                f"Unknown function '{function_name}'. "
+                f"Available functions: {available}"
+            )
+
+        logger.info(
+            "Executing PowerShell function (remote)",
+            function=function_name,
+            host=remote_host,
+            params=parameters
+        )
+
+        bridge = get_bridge()
+        try:
+            result = await bridge.execute_script(
+                script_path=SCRIPT_PATH,
+                function=function_name,
+                params=parameters,
+                remote=True,
+                remote_host=remote_host,
+                username=username,
+                password=password
+            )
+            logger.info(
+                "Remote PowerShell function completed",
+                function=function_name,
+                host=remote_host
+            )
+            return {
+                "success": True,
+                "function": function_name,
+                "remote_host": remote_host,
+                "result": result
+            }
+        except Exception as e:
+            logger.error(
+                "Remote PowerShell function failed",
+                function=function_name,
+                host=remote_host,
+                error=str(e)
+            )
+            return {
+                "success": False,
+                "function": function_name,
+                "remote_host": remote_host,
+                "error": str(e),
+                "error_type": type(e).__name__
+            }
+
+    logger.info("PowerShell tools registered successfully (2 generic tools)")

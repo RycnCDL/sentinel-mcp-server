@@ -137,3 +137,5 @@ sandbox/
 # MCP server runtime
 .mcp/
 mcp-server.log
+PHASE-2-EVALUATION-REPORT.md
+PHASE-2-TEST-RESULTS.md
