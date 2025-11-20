@@ -20,7 +20,9 @@ Before starting, ensure you have:
 
 ## 📦 Step 1: Clone and Setup Repository
 
-### 1.1 Clone Repository
+**Hinweis**: Wenn du bereits in einem GitHub Codespace oder VS Code Remote bist, überspringe Schritt 1.1.
+
+### 1.1 Clone Repository (nur für lokale Installation)
 ```powershell
 # Clone to local directory (replace with actual GitHub URL)
 git clone https://github.com/RycnCDL/sentinel-mcp-server.git
@@ -29,14 +31,13 @@ cd sentinel-mcp-server
 
 ### 1.2 Install Python Dependencies
 ```powershell
-# Create virtual environment
-python -m venv venv
+# Option 1: Install globally (einfacher für Tests)
+python -m pip install -r requirements.txt
 
-# Activate virtual environment
-.\venv\Scripts\Activate.ps1
-
-# Install dependencies
-pip install -r requirements.txt
+# Option 2: Mit Virtual Environment (empfohlen für Production)
+# python -m venv venv
+# .\venv\Scripts\Activate.ps1
+# pip install -r requirements.txt
 ```
 
 ### 1.3 Download SentinelManager.ps1
@@ -216,9 +217,9 @@ Expected: Graceful error message, not a crash
 
 #### Issue: "Module not found" errors
 **Solution:**
-- Activate virtual environment: `.\venv\Scripts\Activate.ps1`
-- Install dependencies: `pip install -r requirements.txt`
+- Install dependencies: `python -m pip install -r requirements.txt`
 - Verify Python version: `python --version` (must be 3.10+)
+- If using venv: Activate with `.\venv\Scripts\Activate.ps1` (falls erstellt)
 
 #### Issue: "PowerShell execution failed"
 **Solution:**
