@@ -11,7 +11,7 @@ import os
 from pathlib import Path
 from typing import Optional, Dict, Any
 from pydantic import BaseModel, Field
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -62,37 +62,38 @@ class Settings(BaseSettings):
     """
     Application settings loaded from environment variables and .env file
     """
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore"
+    )
 
     # Azure Configuration
-    azure_tenant_id: Optional[str] = Field(None, env="AZURE_TENANT_ID")
-    azure_client_id: Optional[str] = Field(None, env="AZURE_CLIENT_ID")
-    azure_client_secret: Optional[str] = Field(None, env="AZURE_CLIENT_SECRET")
-    azure_subscription_id: Optional[str] = Field(None, env="AZURE_SUBSCRIPTION_ID")
-    azure_use_managed_identity: bool = Field(False, env="AZURE_USE_MANAGED_IDENTITY")
+    azure_tenant_id: Optional[str] = Field(default=None, validation_alias="AZURE_TENANT_ID")
+    azure_client_id: Optional[str] = Field(default=None, validation_alias="AZURE_CLIENT_ID")
+    azure_client_secret: Optional[str] = Field(default=None, validation_alias="AZURE_CLIENT_SECRET")
+    azure_subscription_id: Optional[str] = Field(default=None, validation_alias="AZURE_SUBSCRIPTION_ID")
+    azure_use_managed_identity: bool = Field(default=False, validation_alias="AZURE_USE_MANAGED_IDENTITY")
 
     # Logging
-    log_level: str = Field("INFO", env="LOG_LEVEL")
-    log_format: str = Field("json", env="LOG_FORMAT")
-    log_requests: bool = Field(True, env="LOG_REQUESTS")
+    log_level: str = Field(default="INFO", validation_alias="LOG_LEVEL")
+    log_format: str = Field(default="json", validation_alias="LOG_FORMAT")
+    log_requests: bool = Field(default=True, validation_alias="LOG_REQUESTS")
 
     # MCP Server
-    mcp_server_name: str = Field("sentinel-mcp-server", env="MCP_SERVER_NAME")
-    mcp_server_version: str = Field("0.1.0-alpha", env="MCP_SERVER_VERSION")
-    debug_mode: bool = Field(False, env="DEBUG_MODE")
+    mcp_server_name: str = Field(default="sentinel-mcp-server", validation_alias="MCP_SERVER_NAME")
+    mcp_server_version: str = Field(default="0.1.0-alpha", validation_alias="MCP_SERVER_VERSION")
+    debug_mode: bool = Field(default=False, validation_alias="DEBUG_MODE")
 
     # Performance
-    max_concurrent_queries: int = Field(5, env="MAX_CONCURRENT_QUERIES")
-    query_timeout_seconds: int = Field(30, env="QUERY_TIMEOUT_SECONDS")
-    kql_result_limit: int = Field(1000, env="KQL_RESULT_LIMIT")
+    max_concurrent_queries: int = Field(default=5, validation_alias="MAX_CONCURRENT_QUERIES")
+    query_timeout_seconds: int = Field(default=30, validation_alias="QUERY_TIMEOUT_SECONDS")
+    kql_result_limit: int = Field(default=1000, validation_alias="KQL_RESULT_LIMIT")
 
     # Cache
-    enable_workspace_cache: bool = Field(True, env="ENABLE_WORKSPACE_CACHE")
-    workspace_cache_ttl: int = Field(300, env="WORKSPACE_CACHE_TTL")
-
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = False
+    enable_workspace_cache: bool = Field(default=True, validation_alias="ENABLE_WORKSPACE_CACHE")
+    workspace_cache_ttl: int = Field(default=300, validation_alias="WORKSPACE_CACHE_TTL")
 
     def get_azure_config(self) -> AzureConfig:
         """Get Azure configuration"""
