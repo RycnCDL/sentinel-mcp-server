@@ -51,7 +51,7 @@ def setup_logging(level: str = "INFO", format_type: str = "json", log_requests: 
             structlog.processors.StackInfoRenderer(),
             structlog.processors.format_exc_info,
             structlog.processors.UnicodeDecoder(),
-            structlog.dev.ConsoleRenderer(colors=True),
+            structlog.dev.ConsoleRenderer(colors=False),  # Disable colors for STDIO
         ]
 
     # Configure structlog
@@ -62,6 +62,9 @@ def setup_logging(level: str = "INFO", format_type: str = "json", log_requests: 
         logger_factory=LoggerFactory(),
         cache_logger_on_first_use=True,
     )
+    
+    # Suppress structlog warnings to stderr
+    logging.getLogger("structlog").setLevel(logging.ERROR)
 
     logger = structlog.get_logger(__name__)
     logger.info(
