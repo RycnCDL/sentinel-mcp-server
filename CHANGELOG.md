@@ -7,11 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planning Phase
-- Initial project structure and documentation
-- Architecture design in progress
-- Tool prioritization
-- Security design considerations
+### Added
+- **Analytics Rules Exploration**: New tools to list and retrieve detailed information about Sentinel analytics rules
+  - `sentinel_list_analytics_rules` - List all analytics rules across workspaces with filtering capabilities
+  - `sentinel_get_analytics_rule` - Get detailed rule configuration including detection queries (KQL), entity mappings, and incident settings
+- Comprehensive tool reference documentation in `docs/03-tool-reference.md`
+
+### Changed
+- Updated README.md to reflect 3 Python tools (was 1)
+- Enhanced documentation with detailed examples and use cases for analytics rules
+
+### Technical Details
+- New module: `src/mcp_server/tools/exploration/analytics_rules.py`
+- Support for all rule types: Scheduled, Fusion, MLBehaviorAnalytics, MicrosoftSecurityIncidentCreation
+- Extraction of KQL queries, MITRE ATT&CK mappings, entity configurations, and alert settings
 
 ## [0.1.0-alpha] - 2025-11-19
 

@@ -87,8 +87,10 @@ python -m src
 
 ## 🛠️ Available Tools
 
-### Python Tools (1)
+### Python Tools (3)
 - ✅ `sentinel_health_check` - Multi-tenant health status monitoring with quick/detailed modes
+- ✅ `sentinel_list_analytics_rules` - List all analytics rules across workspaces with filtering
+- ✅ `sentinel_get_analytics_rule` - Get detailed configuration and detection logic for a specific rule
 
 ### PowerShell Tools (40+)
 
